@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Martini — Back Stiffener Matrix</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,33 +25,43 @@
   --s2b:#2e2410; --s2t:#c49030;
   --s3b:#162416; --s3t:#5aaa6a;
   --s4b:#0e2820; --s4t:#4db39e;
+  --vh: 1vh; /* corrected by JS for mobile browser chrome */
 }
 
 html, body {
-  width: 100vw; height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: 'Helvetica Neue', Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
 
+body {
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* ── DESKTOP / LANDSCAPE LAYOUT (fits to one screen) ── */
 .shell {
-  width: 100vw; height: 100vh;
-  display: flex; flex-direction: column;
-  padding: 2vh 3vw; gap: 1.5vh;
+  width: 100%;
+  min-height: calc(var(--vh, 1vh) * 100);
+  display: flex;
+  flex-direction: column;
+  padding: 2vh 3vw;
+  gap: 1.5vh;
 }
 
 /* ── HEADER ── */
 .header {
   display: flex; align-items: center; justify-content: space-between;
   padding-bottom: 1.5vh; border-bottom: 1px solid var(--border);
-  flex-shrink: 0; gap: 2vw;
+  flex-shrink: 0; gap: 2vw; flex-wrap: wrap;
 }
 .eyebrow { font-size: clamp(9px,.7vw,13px); letter-spacing:.14em; text-transform:uppercase; color:var(--teal); margin-bottom:.4vh; }
 h1 { font-size:clamp(18px,1.8vw,32px); font-weight:700; color:var(--white); letter-spacing:-.02em; line-height:1.1; }
 .sub { font-size:clamp(9px,.65vw,12px); color:var(--muted); margin-top:.3vh; }
 
-.hdr-right { display:flex; align-items:center; gap:2.5vw; flex-shrink:0; }
+.hdr-right { display:flex; align-items:center; gap:2.5vw; flex-shrink:0; flex-wrap: wrap; }
 
 .score-key {
   display:flex; align-items:center; gap:.6vw;
@@ -70,11 +80,11 @@ h1 { font-size:clamp(18px,1.8vw,32px); font-weight:700; color:var(--white); lett
 .k4{background:var(--s4b);color:var(--s4t);}
 .kdesc { font-size:clamp(8px,.6vw,11px); color:var(--muted); margin-right:.5vw; }
 
-.legend { display:flex; gap:1.5vw; }
+.legend { display:flex; gap:1.5vw; flex-wrap: wrap; }
 .leg { display:flex; align-items:center; gap:.5vw; font-size:clamp(10px,.8vw,14px); font-weight:700; }
-.ldot { width:clamp(8px,.7vw,13px); height:clamp(8px,.7vw,13px); border-radius:50%; }
+.ldot { width:clamp(8px,.7vw,13px); height:clamp(8px,.7vw,13px); border-radius:50%; flex-shrink:0; }
 
-/* ── GRID ── */
+/* ── GRID (desktop) ── */
 .grid-outer {
   flex:1; min-height:0;
   display:grid;
@@ -114,6 +124,7 @@ h1 { font-size:clamp(18px,1.8vw,32px); font-weight:700; color:var(--white); lett
   font-size:clamp(12px,1vw,18px); font-weight:600;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   user-select:none; transition:background .1s; flex-shrink:0; padding-bottom:1px;
+  touch-action: manipulation;
 }
 .wb:hover { background:var(--bd2); }
 .wnum { font-size:clamp(11px,.9vw,16px); font-weight:700; color:var(--white); min-width:1vw; text-align:center; }
@@ -123,6 +134,7 @@ h1 { font-size:clamp(18px,1.8vw,32px); font-weight:700; color:var(--white); lett
   display:flex; align-items:center; justify-content:center;
   font-size:clamp(13px,1.1vw,20px); font-weight:700;
   cursor:pointer; user-select:none; transition:transform .1s;
+  touch-action: manipulation;
 }
 .sc-circle:hover { transform:scale(1.1); }
 .sc-circle:active { transform:scale(.94); }
@@ -147,7 +159,166 @@ h1 { font-size:clamp(18px,1.8vw,32px); font-weight:700; color:var(--white); lett
   letter-spacing:.07em; text-transform:uppercase; margin-top:.3vh;
 }
 
-.hint { flex-shrink:0; font-size:clamp(8px,.6vw,11px); color:var(--muted); display:flex; gap:2vw; }
+.hint { flex-shrink:0; font-size:clamp(8px,.6vw,11px); color:var(--muted); display:flex; gap:2vw; flex-wrap: wrap; }
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE / NARROW LAYOUT
+   Below 760px: switch from one-screen grid to a scrollable
+   stacked card layout — one card per criterion, all three
+   design scores shown side by side within each card.
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 760px) {
+  html, body { height: auto; overflow-x: hidden; }
+  body { min-height: 100%; }
+
+  .shell {
+    min-height: 100%;
+    height: auto;
+    padding: 18px 16px 28px;
+    gap: 14px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 14px;
+    gap: 12px;
+  }
+  .eyebrow { font-size: 10px; margin-bottom: 4px; }
+  h1 { font-size: 21px; }
+  .sub { font-size: 11px; margin-top: 4px; }
+
+  .hdr-right {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .score-key {
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .score-key-lbl { font-size: 10px; }
+  .kp { width: 22px; height: 22px; font-size: 11px; }
+  .kdesc { font-size: 10px; }
+
+  .legend { gap: 14px; }
+  .leg { font-size: 12px; }
+  .ldot { width: 9px; height: 9px; }
+
+  /* Grid becomes a single column of stacked cards */
+  .grid-outer {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    border: 1px solid var(--bd2);
+    overflow: visible;
+  }
+
+  /* Hide the desktop column-header row entirely on mobile;
+     each card carries its own inline design labels instead */
+  .gh { display: none; }
+
+  /* Each criterion becomes one card: label/sub on top,
+     then a 3-column row of [weight | design scores] */
+  .gr-mobile-card {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surf);
+  }
+  .gr-mobile-card.odd-row { background: #131313; }
+  .gr-mobile-card:last-of-type { border-bottom: none; }
+
+  .mc-crit { margin-bottom: 10px; }
+  .mc-crit .cn { font-size: 15px; }
+  .mc-crit .cs { font-size: 12px; margin-top: 3px; }
+
+  .mc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .mc-weight {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .mc-weight-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+  .mc-scores {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    justify-content: flex-end;
+  }
+  .mc-score-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .mc-score-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .wctrl { gap: 6px; }
+  .wb { width: 28px; height: 28px; font-size: 16px; }
+  .wnum { font-size: 15px; min-width: 16px; }
+
+  .sc-circle { width: 42px; height: 42px; font-size: 17px; }
+
+  /* Totals row -> horizontal card */
+  .tot-row-mobile {
+    display: flex;
+    flex-direction: column;
+    background: var(--surf);
+    padding: 16px;
+    border-top: 2px solid var(--bd2);
+  }
+  .tot-row-mobile .tot-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: var(--muted); margin-bottom: 12px;
+  }
+  .tot-cards {
+    display: flex;
+    gap: 10px;
+  }
+  .tot-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: var(--surf2);
+    border-radius: 10px;
+    padding: 12px 8px;
+    border: 1px solid var(--border);
+  }
+  .tot-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .tot-card .tnum { font-size: 24px; }
+  .tot-card .tmax { font-size: 10px; }
+  .tot-card .wchip { font-size: 9px; }
+
+  .hint {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+}
 </style>
 </head>
 <body>
@@ -178,7 +349,7 @@ h1 { font-size:clamp(18px,1.8vw,32px); font-weight:700; color:var(--white); lett
   <div class="grid-outer" id="grid"></div>
 
   <div class="hint">
-    <span>○ Click a score circle to cycle its value</span>
+    <span>○ Tap a score circle to cycle its value</span>
     <span>± Use + / − to raise or lower a criterion's contribution to the total</span>
   </div>
 
@@ -205,10 +376,25 @@ criteria.forEach(function(c) {
 
 function cls(v) { return 'sc-circle c'+v; }
 
+function isMobile() {
+  return window.matchMedia('(max-width: 760px)').matches;
+}
+
 function build() {
   var g = document.getElementById('grid');
   g.innerHTML = '';
 
+  if (isMobile()) {
+    buildMobile(g);
+  } else {
+    buildDesktop(g);
+  }
+
+  updateTotals();
+  attachEvents();
+}
+
+function buildDesktop(g) {
   function gh(cls, html) {
     var d = document.createElement('div');
     d.className='gh '+cls; d.innerHTML=html; g.appendChild(d);
@@ -255,9 +441,56 @@ function build() {
   tc('crit','Weighted total');
   tc('wc','');
   ['none','hdpe','alu'].forEach(function(k){ tc('sc','<div id="tot-'+k+'"></div>'); });
+}
 
-  updateTotals();
+function buildMobile(g) {
+  criteria.forEach(function(c, i) {
+    var w = weights[c.id], s = scores[c.id], odd = i % 2 !== 0;
+    var card = document.createElement('div');
+    card.className = 'gr-mobile-card' + (odd ? ' odd-row' : '');
 
+    card.innerHTML =
+      '<div class="mc-crit"><div class="cn">' + c.label + '</div><div class="cs">' + c.sub + '</div></div>' +
+      '<div class="mc-row">' +
+        '<div class="mc-weight">' +
+          '<span class="mc-weight-label">Weight</span>' +
+          '<div class="wctrl">' +
+            '<button class="wb" data-id="' + c.id + '" data-d="-1">−</button>' +
+            '<span class="wnum" id="wn-' + c.id + '">' + w + '</span>' +
+            '<button class="wb" data-id="' + c.id + '" data-d="1">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="mc-scores">' +
+          mcScoreBlock('none', s.none, 'No stiff.', 'var(--none)', c.id) +
+          mcScoreBlock('hdpe', s.hdpe, 'HDPE', 'var(--hdpe)', c.id) +
+          mcScoreBlock('alu',  s.alu,  'HDPE+Alu', 'var(--alu)', c.id) +
+        '</div>' +
+      '</div>';
+
+    g.appendChild(card);
+  });
+
+  var totWrap = document.createElement('div');
+  totWrap.className = 'tot-row-mobile';
+  totWrap.innerHTML =
+    '<div class="tot-title">Weighted total</div>' +
+    '<div class="tot-cards">' +
+      '<div class="tot-card"><span class="tot-card-label" style="color:var(--none)">No stiff.</span><div id="tot-none"></div></div>' +
+      '<div class="tot-card"><span class="tot-card-label" style="color:var(--hdpe)">HDPE</span><div id="tot-hdpe"></div></div>' +
+      '<div class="tot-card"><span class="tot-card-label" style="color:var(--alu)">HDPE+Alu</span><div id="tot-alu"></div></div>' +
+    '</div>';
+  g.appendChild(totWrap);
+}
+
+function mcScoreBlock(key, val, label, color, critId) {
+  return '<div class="mc-score-block">' +
+    '<span class="mc-score-label" style="color:' + color + '">' + label + '</span>' +
+    '<div class="' + cls(val) + '" id="sc-' + critId + '-' + key + '" data-id="' + critId + '" data-k="' + key + '">' + val + '</div>' +
+  '</div>';
+}
+
+function attachEvents() {
+  var g = document.getElementById('grid');
   g.addEventListener('click', function(e) {
     var wb=e.target.closest('.wb');
     if(wb) {
@@ -287,12 +520,25 @@ function updateTotals() {
   var cols={none:'var(--none)',hdpe:'var(--hdpe)',alu:'var(--alu)'};
   var vals={none:tN,hdpe:tH,alu:tA};
   ['none','hdpe','alu'].forEach(function(k){
-    document.getElementById('tot-'+k).innerHTML=
+    var target = document.getElementById('tot-'+k);
+    if (!target) return;
+    target.innerHTML=
       '<span class="tnum" style="color:'+cols[k]+'">'+vals[k]+'</span>'+
       '<span class="tmax">/ '+max+'</span>'+
       (win===k?'<span class="wchip">top score</span>':'');
   });
 }
+
+/* ── viewport height fix for mobile browser chrome ── */
+function setVH() {
+  var vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', vh + 'px');
+}
+setVH();
+window.addEventListener('resize', function() {
+  setVH();
+  build(); // rebuild on breakpoint cross (desktop <-> mobile)
+});
 
 build();
 </script>
